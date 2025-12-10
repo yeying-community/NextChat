@@ -19,6 +19,7 @@ import { useRef, useEffect } from "react";
 import { showConfirm } from "./ui-lib";
 import { useMobileScreen } from "../utils";
 import clsx from "clsx";
+import { useAuth } from "../hooks/useAuth";
 
 export function ChatItem(props: {
   onClick?: () => void;
@@ -40,7 +41,6 @@ export function ChatItem(props: {
       });
     }
   }, [props.selected]);
-
   const { pathname: currentPath } = useLocation();
   return (
     <Draggable draggableId={`${props.id}`} index={props.index}>
@@ -111,9 +111,16 @@ export function ChatList(props: { narrow?: boolean }) {
       state.moveSession,
     ],
   );
+
   const chatStore = useChatStore();
   const navigate = useNavigate();
   const isMobileScreen = useMobileScreen();
+
+  // 权限认证
+  const isAuthenticated = useAuth();
+  if (!isAuthenticated) {
+    return;
+  }
 
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;

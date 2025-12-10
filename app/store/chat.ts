@@ -38,6 +38,7 @@ import { collectModelsWithDefaultModel } from "../utils/model";
 import { createEmptyMask, Mask } from "./mask";
 import { executeMcpAction, getAllTools, isMcpEnabled } from "../mcp/actions";
 import { extractMcpJson, isMcpJson } from "../mcp/utils";
+import { useAuth } from "../hooks/useAuth";
 
 const localStorage = safeLocalStorage();
 
@@ -409,7 +410,12 @@ export const useChatStore = createPersistStore(
         content: string,
         attachImages?: string[],
         isMcpResponse?: boolean,
+        isAuthenticated: boolean = true,
       ) {
+        // 权限认证
+        if (!isAuthenticated) {
+          return;
+        }
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -842,10 +848,12 @@ export const useChatStore = createPersistStore(
                     typeof result === "object"
                       ? JSON.stringify(result)
                       : String(result);
+                  const isAuthenticated = useAuth();
                   get().onUserInput(
                     `\`\`\`json:mcp-response:${mcpRequest.clientId}\n${mcpResponse}\n\`\`\``,
                     [],
                     true,
+                    isAuthenticated,
                   );
                 })
                 .catch((error) => showToast("MCP execution failed", error));

@@ -112,7 +112,6 @@ export function NewChat() {
         (maskRef.current.scrollWidth - maskRef.current.clientWidth) / 2;
     }
   }, [groups]);
-
   return (
     <div className={styles["new-chat"]}>
       <div className={styles["mask-header"]}>
