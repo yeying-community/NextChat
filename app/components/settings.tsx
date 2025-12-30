@@ -579,9 +579,6 @@ export function Settings() {
   const adminAccount = clientConfig?.adminWalletAccount;
   const storageAccount = localStorage.getItem("currentAccount");
 
-  console.log(`adminAccount = ${adminAccount}`);
-  console.log(`storageAccount = ${storageAccount}`);
-  console.log(`isAdmin = ${isAdmin}`);
   const updateStore = useUpdateStore();
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const currentVersion = updateStore.formatVersion(updateStore.version);
@@ -724,43 +721,44 @@ export function Settings() {
   );
 
   const openAIConfigComponent = accessStore.provider ===
-    ServiceProvider.OpenAI && (
-    <>
-      <ListItem
-        title={Locale.Settings.Access.OpenAI.Endpoint.Title}
-        subTitle={Locale.Settings.Access.OpenAI.Endpoint.SubTitle}
-      >
-        <input
-          aria-label={Locale.Settings.Access.OpenAI.Endpoint.Title}
-          type="text"
-          value={accessStore.openaiUrl}
-          placeholder={ROUTER_BASE_URL}
-          onChange={(e) =>
-            accessStore.update(
-              (access) => (access.openaiUrl = e.currentTarget.value),
-            )
-          }
-        ></input>
-      </ListItem>
-      <ListItem
-        title={Locale.Settings.Access.OpenAI.ApiKey.Title}
-        subTitle={Locale.Settings.Access.OpenAI.ApiKey.SubTitle}
-      >
-        <PasswordInput
-          aria={Locale.Settings.ShowPassword}
-          aria-label={Locale.Settings.Access.OpenAI.ApiKey.Title}
-          value={accessStore.openaiApiKey}
-          type="text"
-          placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
-          onChange={(e) => {
-            accessStore.update(
-              (access) => (access.openaiApiKey = e.currentTarget.value),
-            );
-          }}
-        />
-      </ListItem>
-    </>
-  );
+    ServiceProvider.OpenAI &&
+    isAdmin && (
+      <>
+        <ListItem
+          title={Locale.Settings.Access.OpenAI.Endpoint.Title}
+          subTitle={Locale.Settings.Access.OpenAI.Endpoint.SubTitle}
+        >
+          <input
+            aria-label={Locale.Settings.Access.OpenAI.Endpoint.Title}
+            type="text"
+            value={accessStore.openaiUrl}
+            placeholder={ROUTER_BASE_URL}
+            onChange={(e) =>
+              accessStore.update(
+                (access) => (access.openaiUrl = e.currentTarget.value),
+              )
+            }
+          ></input>
+        </ListItem>
+        <ListItem
+          title={Locale.Settings.Access.OpenAI.ApiKey.Title}
+          subTitle={Locale.Settings.Access.OpenAI.ApiKey.SubTitle}
+        >
+          <PasswordInput
+            aria={Locale.Settings.ShowPassword}
+            aria-label={Locale.Settings.Access.OpenAI.ApiKey.Title}
+            value={accessStore.openaiApiKey}
+            type="text"
+            placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
+            onChange={(e) => {
+              accessStore.update(
+                (access) => (access.openaiApiKey = e.currentTarget.value),
+              );
+            }}
+          />
+        </ListItem>
+      </>
+    );
 
   return (
     <ErrorBoundary>
@@ -1140,24 +1138,26 @@ export function Settings() {
             </ListItem>
           ) : null}
 
-          <ListItem
-            title={Locale.Settings.Access.CustomModel.Title}
-            subTitle={Locale.Settings.Access.CustomModel.SubTitle}
-            vertical={true}
-          >
-            <input
-              aria-label={Locale.Settings.Access.CustomModel.Title}
-              style={{ width: "100%", maxWidth: "unset", textAlign: "left" }}
-              type="text"
-              value={config.customModels}
-              placeholder="model1,model2,model3"
-              onChange={(e) =>
-                config.update(
-                  (config) => (config.customModels = e.currentTarget.value),
-                )
-              }
-            ></input>
-          </ListItem>
+          {isAdmin && (
+            <ListItem
+              title={Locale.Settings.Access.CustomModel.Title}
+              subTitle={Locale.Settings.Access.CustomModel.SubTitle}
+              vertical={true}
+            >
+              <input
+                aria-label={Locale.Settings.Access.CustomModel.Title}
+                style={{ width: "100%", maxWidth: "unset", textAlign: "left" }}
+                type="text"
+                value={config.customModels}
+                placeholder="model1,model2,model3"
+                onChange={(e) =>
+                  config.update(
+                    (config) => (config.customModels = e.currentTarget.value),
+                  )
+                }
+              ></input>
+            </ListItem>
+          )}
         </List>
 
         <List>
