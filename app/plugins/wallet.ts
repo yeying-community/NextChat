@@ -166,16 +166,10 @@ export async function loginWithChallenge() {
   }
   try {
     // 1. 从后端获取 Challenge
-    const header = {
-      did: "xxxx",
-    };
     const body = {
-      header: header,
-      body: {
-        address: currentAccount,
-      },
+      address: currentAccount,
     };
-    const response = await fetch("/api/yeying/api/v1/auth/challenge", {
+    const response = await fetch("/api/v1/public/common/auth/challenge", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -183,6 +177,8 @@ export async function loginWithChallenge() {
       },
       body: JSON.stringify(body),
     });
+
+    console.log(`response=${response}`);
 
     if (!response.ok) {
       throw new Error(
@@ -192,7 +188,7 @@ export async function loginWithChallenge() {
       );
     }
     const r = await response.json();
-    const challenge = r.body.result;
+    const challenge = r.message;
     if (typeof window.ethereum === "undefined") {
       return;
     }
@@ -202,17 +198,11 @@ export async function loginWithChallenge() {
       params: [challenge, currentAccount],
     });
     // 3. 发送签名到后端验证
-    const header2 = {
-      did: "xxxx",
-    };
     const body2 = {
-      header: header2,
-      body: {
-        address: currentAccount,
-        signature: signature,
-      },
+      address: currentAccount,
+      signature: signature,
     };
-    const verifyRes = await fetch("/api/yeying/api/v1/auth/verify", {
+    const verifyRes = await fetch("/api/v1/public/common/auth/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -224,7 +214,7 @@ export async function loginWithChallenge() {
       throw new Error("❌验证失败");
     }
     const r2 = await verifyRes.json();
-    const token = r2.body.token;
+    const token = r2.token;
     // 4. 保存 Token
     localStorage.setItem("authToken", token);
     notifySuccess(`✅登录成功`);

@@ -10,25 +10,29 @@ if (!YEYING_BACKEND_URL) {
 }
 
 // 允许的路径前缀（安全限制）
-const ALLOWED_PATHS = ["/api/v1/auth/challenge", "/api/v1/auth/verify"];
+const ALLOWED_PATHS = [
+  "/api/v1/public/common/auth/challenge",
+  "/api/v1/public/common/auth/verify",
+];
 
 async function handle(
   req: NextRequest,
   { params }: { params: { path: string[] } },
 ) {
   // 构造原始请求路径
-  const originalPath = `/${params.path.join("/")}`;
+  const requestUrl = new URL(req.url);
+  const urlPath = requestUrl.pathname;
 
   // 安全校验：只允许特定接口
-  if (!ALLOWED_PATHS.some((allowed) => originalPath.startsWith(allowed))) {
+  if (!ALLOWED_PATHS.some((allowed) => requestUrl.pathname.endsWith(allowed))) {
     return NextResponse.json(
-      { error: true, msg: "Forbidden API path" },
+      { error: true, msg: "Forbidden API path => " + urlPath },
       { status: 403 },
     );
   }
 
   // 构造目标 URL
-  const targetUrl = `${YEYING_BACKEND_URL}${originalPath}`;
+  const targetUrl = `${YEYING_BACKEND_URL}${urlPath}`;
 
   // 转发请求头（保留 Content-Type、Authorization 等）
   const headers: HeadersInit = {};
